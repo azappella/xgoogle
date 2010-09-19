@@ -141,20 +141,24 @@ class GoogleSearch(object):
         self._results_per_page = rpp
 
     results_per_page = property(_get_results_per_page, _set_results_par_page)
-
+    
+	## Fix to make the results appear / 11.06.2010 -> http://www.catonmat.net/blog/python-library-for-google-search
     def get_results(self):
         """ Gets a page of results """
         if self.eor:
             return []
-
+        MAX_VALUE = 1000000
         page = self._get_results_page()
-        search_info = self._extract_info(page)
+        #search_info = self._extract_info(page)
+        results = self._extract_results(page)
+        search_info = {'from': self.results_per_page*self._page,
+                       'to': self.results_per_page*self._page + len(results),
+                       'total': MAX_VALUE}
         if not self.results_info:
             self.results_info = search_info
             if self.num_results == 0:
                 self.eor = True
                 return []
-        results = self._extract_results(page)
         if not results:
             self.eor = True
             return []
